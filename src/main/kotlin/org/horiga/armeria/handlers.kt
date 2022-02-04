@@ -41,9 +41,24 @@ class ApiRequestHandler(
             message, delay, RequestContexts.credentials()
         )
         try {
-//            return apiClient.fetch("/echo?message=$message&${delay(delay)}")
             return apiClient.fetch("/echo?message=$message")
+                .zipWhen {
+                    log.info("handle @zipWhen, message=${it.message}")
+                    apiClient.fetch("/echo?message=${it.message.reversed()}")
+                }.flatMap { tuple ->
+                    log.info("handle @flatMap, t1.message=${tuple.t1.message}, t2.message=${tuple.t2.message}")
+                    if (message in "error") {
+                        return@flatMap Mono.error(RuntimeException("contains error message"))
+                    }
+                    val results = "${tuple.t1.message}:${tuple.t2.message}"
+                    Mono.just(EchoResponseMessage(results))
+                }.onErrorMap(RuntimeException::class.java) {
+                    // handle RuntimeException and map to IllegalStateException
+                    log.error("handle @onErrorMap")
+                    throw IllegalStateException(it)
+                }
         } finally {
+            // Note: this log will be output before the contents of the try are processed.
             log.info("[end] api#produce")
         }
     }
