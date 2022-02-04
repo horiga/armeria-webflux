@@ -71,10 +71,10 @@ class ApiRequestHandler(
         @Param("message") @Default("echo") message: String
     ): Mono<EchoResponseMessage> {
         return Mono.zip(
-            apiClient.fetch("/echo?message=${message}1&delay=300"),
+            apiClient.fetch("/echo?message=${message}1&delay=3000"),
             apiClient.fetch("/echo?message=${message}2&delay=2000"),
             apiClient.fetch("/echo?message=${if(message in "err") "nf" else message + "3"}"),
-            apiClient.fetch("/echo?message=${message}4"),
+            apiClient.fetch("/echo?message=${message}4&delay=1000"),
         ).flatMap {
             log.info("handle Mono.zip/@flatMap {}")
             val results = "${it.t1.message},${it.t2.message},${it.t3.message},${it.t4.message}"
