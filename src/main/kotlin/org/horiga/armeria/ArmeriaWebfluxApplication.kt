@@ -2,9 +2,11 @@ package org.horiga.armeria
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.scheduling.annotation.EnableScheduling
 import java.security.Security
 
 @SpringBootApplication
+@EnableScheduling
 class ArmeriaWebfluxApplication {
 	companion object {
 		init {

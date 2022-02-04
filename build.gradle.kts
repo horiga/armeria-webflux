@@ -37,6 +37,8 @@ dependencies {
 	implementation("io.projectreactor.addons:reactor-extra:3.3.4.RELEASE")
 	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.0.2.RELEASE")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+	implementation("com.github.ben-manes.caffeine:caffeine:3.0.5")
+	implementation("com.google.guava:guava:31.0.1-jre")
 
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
