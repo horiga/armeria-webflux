@@ -30,6 +30,7 @@ class ApiRequestHandler(
         val log = LoggerFactory.getLogger(ApiRequestHandler::class.java)!!
     }
 
+    // Sequential task (Mono.zipWhen(task_result) -> flatMap)
     @Get("/produce")
     @Produces("application/json; charset=utf-8")
     fun produce(
@@ -42,9 +43,9 @@ class ApiRequestHandler(
         )
         try {
             return apiClient.fetch("/echo?message=$message")
-                .zipWhen {
-                    log.info("handle @zipWhen, message=${it.message}")
-                    apiClient.fetch("/echo?message=${it.message.reversed()}")
+                .zipWhen { res ->
+                    log.info("handle @zipWhen, message=${res.message}")
+                    apiClient.fetch("/echo?message=${res.message.reversed()}")
                 }.flatMap { tuple ->
                     log.info("handle @flatMap, t1.message=${tuple.t1.message}, t2.message=${tuple.t2.message}")
                     if (message in "error") {
@@ -52,14 +53,35 @@ class ApiRequestHandler(
                     }
                     val results = "${tuple.t1.message}:${tuple.t2.message}"
                     Mono.just(EchoResponseMessage(results))
-                }.onErrorMap(RuntimeException::class.java) {
+                }.onErrorMap(RuntimeException::class.java) { err ->
                     // handle RuntimeException and map to IllegalStateException
                     log.error("handle @onErrorMap")
-                    throw IllegalStateException(it)
+                    throw IllegalStateException(err)
                 }
         } finally {
             // Note: this log will be output before the contents of the try are processed.
             log.info("[end] api#produce")
+        }
+    }
+
+    // Parallel task (Mono.zip(task...) -> flatMap)
+    @Get("/parallel")
+    @Produces("application/json; charset=utf-8")
+    fun parallel(
+        @Param("message") @Default("echo") message: String
+    ): Mono<EchoResponseMessage> {
+        return Mono.zip(
+            apiClient.fetch("/echo?message=${message}1&delay=300"),
+            apiClient.fetch("/echo?message=${message}2&delay=2000"),
+            apiClient.fetch("/echo?message=${if(message in "err") "nf" else message + "3"}"),
+            apiClient.fetch("/echo?message=${message}4"),
+        ).flatMap {
+            log.info("handle Mono.zip/@flatMap {}")
+            val results = "${it.t1.message},${it.t2.message},${it.t3.message},${it.t4.message}"
+            Mono.just(EchoResponseMessage(results))
+        }.onErrorMap { err ->
+            log.error("handle @onErrorMap", err)
+            throw IllegalStateException(err)
         }
     }
 
