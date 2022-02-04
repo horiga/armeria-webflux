@@ -19,9 +19,10 @@ class AuthenticationService(
     companion object {
         val log = LoggerFactory.getLogger(AuthenticationService::class.java)!!
 
-        fun newDecorator(verifyService: VerifyService) = Function<HttpService, AuthenticationService> {
-            AuthenticationService(it, verifyService)
-        }
+        fun newDecorator(verifyService: VerifyService) =
+            Function<HttpService, AuthenticationService> { delegate ->
+                AuthenticationService(delegate, verifyService)
+            }
     }
 
     override fun serve(ctx: ServiceRequestContext, req: HttpRequest): HttpResponse {
