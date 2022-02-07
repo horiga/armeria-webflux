@@ -19,9 +19,11 @@ import com.linecorp.armeria.server.annotation.RequestObject
 import org.horiga.armeria.service.BookService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import org.springframework.validation.annotation.Validated
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.util.annotation.Nullable
+import javax.validation.Valid
 import javax.validation.constraints.Min
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Pattern
@@ -125,6 +127,7 @@ class ApiRequestHandler(
 }
 
 @Component
+@Validated
 class BooksHandler(
     val bookService: BookService
 ) {
@@ -156,7 +159,7 @@ class BooksHandler(
     @Consumes(MediaTypeNames.JSON_UTF_8)
     @Produces(MediaTypeNames.JSON_UTF_8)
     fun add(
-        @RequestObject message: BookMessage
+        @Valid @RequestObject message: BookMessage
     ) = bookService.add(message.name, message.isbn, message.price, message.publishedAt).map {
         BookMessage.of(it)
     }
