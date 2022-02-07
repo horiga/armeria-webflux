@@ -1,0 +1,13 @@
+USE test;
+SET CHARSET utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `book` (
+    `id` INT(11) NOT NULL AUTO_INCREMENT,
+    `isbn` VARCHAR(200) DEFAULT NULL,
+    `name` VARCHAR(200) DEFAULT NULL,
+    `price` INT(11) UNSIGNED NOT NULL,
+    `published_at` DATETIME NOT NULL,
+    `updated_at` DATETIME DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE idx_isbn(`isbn`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
