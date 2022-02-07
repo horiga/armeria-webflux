@@ -3,14 +3,17 @@ package org.horiga.armeria
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.joda.JodaModule
+import com.fasterxml.jackson.datatype.jsr310.JSR310Module
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.linecorp.armeria.client.ClientFactory
 import com.linecorp.armeria.client.WebClient
 import com.linecorp.armeria.client.logging.LoggingClient
 import com.linecorp.armeria.common.HttpHeaderNames
 import com.linecorp.armeria.common.metric.MeterIdPrefixFunction
+import com.linecorp.armeria.server.annotation.JacksonRequestConverterFunction
 import com.linecorp.armeria.server.annotation.JacksonResponseConverterFunction
-import com.linecorp.armeria.server.logging.AccessLogWriter
 import com.linecorp.armeria.server.metric.MetricCollectingService
 import com.linecorp.armeria.spring.ArmeriaServerConfigurator
 import io.micrometer.core.instrument.MeterRegistry
@@ -39,6 +42,7 @@ class ArmeriaServerConfiguration(
         objectMapper: ObjectMapper,
         exceptionHandler: ExceptionHandler,
         apiRequestHandler: ApiRequestHandler,
+        booksHandler: BooksHandler,
         verifyService: VerifyService
     ) = ArmeriaServerConfigurator { sb ->
         sb.annotatedService()
@@ -53,6 +57,15 @@ class ArmeriaServerConfiguration(
             )
             .exceptionHandlers(exceptionHandler)
             .build(apiRequestHandler)
+
+        sb.annotatedService()
+            .defaultServiceName("books")
+            .requestTimeout(Duration.ofMillis(30000))
+            .requestConverters(JacksonRequestConverterFunction(objectMapper))
+            .responseConverters(JacksonResponseConverterFunction(objectMapper))
+            .decorators(MetricCollectingService.newDecorator(MeterIdPrefixFunction.ofDefault("books")))
+            .exceptionHandlers(exceptionHandler)
+            .build(booksHandler)
     }
 
     @Bean
@@ -75,6 +88,8 @@ class ArmeriaServerConfiguration(
 
     @Bean
     fun objectMapper() = jacksonObjectMapper()
+        .registerModule(JavaTimeModule()) // java.time.*
+        .registerModule(JodaModule())
         .configure(SerializationFeature.INDENT_OUTPUT, false)
         .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true)
         .configure(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false)

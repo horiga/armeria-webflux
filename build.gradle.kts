@@ -31,12 +31,15 @@ dependencyManagement {
 dependencies {
 	implementation("com.linecorp.armeria:armeria-spring-boot2-webflux-starter")
 	implementation("com.linecorp.armeria:armeria-spring-boot2-actuator-starter")
+    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
 	implementation("io.projectreactor.netty:reactor-netty")
 	implementation("io.micrometer:micrometer-registry-prometheus:1.8.1")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("io.projectreactor.addons:reactor-extra:3.3.4.RELEASE")
 	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.0.2.RELEASE")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+    implementation("com.github.jasync-sql:jasync-r2dbc-mysql:1.2.3")
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-joda")
 
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
