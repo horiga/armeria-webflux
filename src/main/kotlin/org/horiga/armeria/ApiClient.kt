@@ -28,6 +28,7 @@ class ApiClient(
             )
             .aggregate()
             .handle { res, cause ->
+                log.info("RECEIVED HTTP RESPONSE! res=${res}, cause=$cause")
                 if (cause != null) {
                     throw CompletionException("Failed to Calling API", cause)
                 }

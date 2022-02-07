@@ -27,9 +27,9 @@ import java.time.Duration
 @ConfigurationProperties(prefix = "app")
 data class Properties(
     var endpoint: String = "",
-    var connectionTimeout: Duration = Duration.ofMillis(1000),
-    var responseTimeout: Duration = Duration.ofMillis(3000),
-    var writeTimeout: Duration = Duration.ofMillis(3000)
+    var connectionTimeout: Duration = Duration.ofMillis(3000),
+    var responseTimeout: Duration = Duration.ofMillis(30000),
+    var writeTimeout: Duration = Duration.ofMillis(30000)
 )
 
 @Configuration

@@ -40,6 +40,8 @@ dependencies {
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     implementation("com.github.jasync-sql:jasync-r2dbc-mysql:1.2.3")
 	implementation("com.fasterxml.jackson.datatype:jackson-datatype-joda")
+	implementation("com.github.ben-manes.caffeine:caffeine:3.0.5")
+	implementation("com.google.guava:guava:31.0.1-jre")
 
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
